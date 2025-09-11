@@ -1,4 +1,5 @@
-FROM arm64v8/ros:jazzy
+#FROM arm64v8/ros:jazzy
+FROM ros:jazzy
 
 RUN apt-get update && apt-get upgrade -y
 
