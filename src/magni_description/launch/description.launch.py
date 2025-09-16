@@ -7,7 +7,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
 ARGUMENTS = [
-    DeclareLaunchArgument('use_sim_time',default_value='false',choices=['true','false'], description='sim time'),
+    DeclareLaunchArgument('use_mock_hardware',default_value='false',choices=['true','false'], description='use_mock_hardware'),
     DeclareLaunchArgument('tower_installed',default_value='false',choices=['true','false'], description='tower'),
     DeclareLaunchArgument('shell_installed',default_value='false',choices=['true','false'], description='shell'),
     DeclareLaunchArgument('sonars_installed',default_value='false',choices=['true','false'], description='sonars'),
@@ -20,9 +20,11 @@ def generate_launch_description():
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
+        output="both",
         parameters=[{
             'robot_description': ParameterValue(
                 Command(['xacro ', str(path_to_urdf), ' ',
+                            ' use_mock_hardware:=', LaunchConfiguration('use_mock_hardware'),
                             ' tower_installed:=', LaunchConfiguration('tower_installed'),
                             ' shell_installed:=', LaunchConfiguration('shell_installed'),
                             ' sonars_installed:=', LaunchConfiguration('sonars_installed'),
@@ -32,15 +34,7 @@ def generate_launch_description():
                 value_type=str
             )
         }])
-    
-    joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        parameters=[{
-            'use_gui': False
-        }])
-    
+ 
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(robot_state_publisher)
-    ld.add_action(joint_state_publisher)
     return ld

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="magni">
 
+  <xacro:arg name="use_mock_hardware" default="false"/>
+
   <xacro:arg name="sonars_installed" default="false"/>
   <xacro:property name="sonars_installed" value="$(arg sonars_installed)"/>
 
@@ -19,8 +21,7 @@
   <xacro:property name="wheel_r" value="0.1" />
   <xacro:property name="wheel_xpos" value="0.11" />
 
-  <xacro:include filename="$(find magni_description)/urdf/magni.transmission.xacro" />
-  <xacro:include filename="$(find magni_description)/urdf/magni.gazebo.xacro" />
+  <xacro:include filename="$(find magni_description)/urdf/magni.control.xacro" />
   <xacro:include filename="$(find magni_description)/urdf/inertial.xacro" />
   <xacro:include filename="$(find magni_description)/urdf/sensors/sonar_hc-sr04.xacro" />
   <xacro:include filename="$(find magni_description)/urdf/sensors/raspi_camera.xacro" />
@@ -241,5 +242,8 @@
         rpy="${lidar_extrinsics['roll']} ${lidar_extrinsics['pitch']} ${lidar_extrinsics['yaw']}"/>
     </xacro:ur50_lidar>
   </xacro:if>
+
+  <!-- Define Controller-->
+  <xacro:magni_ros2_control name="magnihw" use_mock_hardware="$(arg use_mock_hardware)"/>
 
 </robot>

@@ -14,7 +14,6 @@
                 <alwaysOn>true</alwaysOn>
             </ros>
         </device>
-        <plugin type="magni_webots::MagniDriver" />
+        <plugin type="webots_ros2_control::Ros2Control" />
     </webots>
-    <xacro:include filename="$(find magni_description)/urdf/magni.urdf.xacro" />
 </robot>
