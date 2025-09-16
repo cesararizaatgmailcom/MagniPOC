@@ -36,8 +36,7 @@ RUN apt-get install -y python3-pip \
     ros-jazzy-nav2-bringup \
     ros-jazzy-cartographer-ros \
     ros-jazzy-teleop-twist-keyboard \
-    ros-jazzy-image-transport-plugins \
-    ros-jazzy-slam-toolbox
+    ros-jazzy-image-transport-plugins
 
 ENV SHELL=/bin/bash
 ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
