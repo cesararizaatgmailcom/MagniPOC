@@ -37,18 +37,6 @@
         <mesh filename="package://magni_description/meshes/magni_body.dae" />
       </geometry>
     </visual>
-	  <visual>
-      <origin xyz="${-wheel_xpos-0.169} 0.17 ${-wheel_r+0.09}" rpy="0 0 ${pi}" />
-      <geometry>
-        <mesh filename="package://magni_description/meshes/caster_wheel.dae" />
-      </geometry>
-    </visual>
-	  <visual>
-      <origin xyz="${-wheel_xpos-0.169} -0.17 ${-wheel_r+0.09}" rpy="0 0 ${pi}" />
-      <geometry>
-        <mesh filename="package://magni_description/meshes/caster_wheel.dae" />
-      </geometry>
-    </visual>
     <collision>
 	    <origin xyz="${-wheel_xpos} 0 ${-wheel_r+0.151}" rpy="0 0 0" />
         <geometry>
@@ -59,18 +47,6 @@
       <origin xyz="${-wheel_xpos-0.026} 0 ${-wheel_r+0.248}" rpy="0 0 0" />
       <geometry>
         <box size="0.375 0.268 0.034"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="${-wheel_xpos-0.169} 0.169 ${-wheel_r+0.106}" rpy="0 0 0" />
-      <geometry>
-        <box size="0.1 0.07 0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="${-wheel_xpos-0.169} -0.169 ${-wheel_r+0.106}" rpy="0 0 0" />
-      <geometry>
-        <box size="0.1 0.07 0.07"/>
       </geometry>
     </collision>
     <xacro:box_inertial_with_origin  x="0.398" y="0.221" z="0.150" mass="10.0">
@@ -187,17 +163,50 @@
 
   <!-- Macro for defining caster wheels -->
   <xacro:macro name="caster_wheel" params="prefix reflect">
-    <link name="${prefix}_caster_wheel">
+    <link name="${prefix}_caster_wheel_support">
       <collision>
-        <origin xyz="${-wheel_xpos-0.19} ${reflect*0.169} ${-wheel_r+0.04}" rpy="0 0 0" />
+        <origin xyz="-0.025 ${reflect*0.01} 0" rpy="0 0 0" />
         <geometry>
-          <sphere radius="0.04"/>
+           <box size="0.05 0.04 0.01"/>
         </geometry>
       </collision>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${pi}" />
+        <geometry>
+          <mesh filename="package://magni_description/meshes/caster_wheel.dae" />
+        </geometry>
+      </visual>
+      <xacro:box_inertial_with_origin  x="0.05" y="0.04" z="0.01" mass="0.25">
+        <origin xyz="-0.025 ${reflect*0.01} 0" rpy="0 0 0" />
+      </xacro:box_inertial_with_origin>
     </link>
-    <joint name="${prefix}_caster_wheel_joint" type="continuous">
+    
+    <joint name="${prefix}_caster_wheel_support_joint" type="continuous">
+      <origin xyz="${-wheel_xpos-0.169} ${reflect*0.169} ${-wheel_r+0.09}" rpy="0 0 0" />
+      <axis xyz="0 0 1" rpy="0 0 0" /> 
       <parent link="base_link"/>
+      <child link="${prefix}_caster_wheel_support"/>
+      <dynamics damping="0.0" friction="0.0"/> 
+    </joint>
+
+    <link name="${prefix}_caster_wheel">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${pi/2} 0" />
+        <geometry>
+          <cylinder length="0.02" radius="0.0381"/>
+        </geometry>
+      </collision>
+      <xacro:cylinder_inertial_with_origin radius="0.0381" length="0.02" mass="0.25">
+        <origin xyz="0 0 0" rpy="0 ${pi/2} 0" />
+      </xacro:cylinder_inertial_with_origin>
+    </link>
+
+    <joint name="${prefix}_caster_wheel_joint" type="continuous">
+      <origin xyz="-0.02 0 -0.053" rpy="0 0 ${pi/2}" />
+      <axis xyz="1 0 0" rpy="0 0 0" />
+      <parent link="${prefix}_caster_wheel_support"/>
       <child link="${prefix}_caster_wheel"/>
+      <dynamics damping="0.0" friction="0.0"/> 
     </joint>
   </xacro:macro>
 
