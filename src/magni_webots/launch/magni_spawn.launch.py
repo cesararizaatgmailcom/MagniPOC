@@ -2,7 +2,7 @@ import os
 import launch
 import xacro
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, RegisterEventHandler, DeclareLaunchArgument, ExecuteProcess
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory, get_package_share_path
@@ -14,6 +14,7 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, UnlessCondition
 
 def get_robot_spawner(*args):
     use_sim_time = LaunchConfiguration("use_sim_time")
@@ -24,6 +25,7 @@ def get_robot_spawner(*args):
     
     magni_webots_pkg_share = get_package_share_directory('magni_webots')
     magni_wb_xacro_path = os.path.join(magni_webots_pkg_share,'resource', 'magni_wb.urdf.xacro')
+    node_remover_xacro_path = os.path.join(magni_webots_pkg_share,'resource', 'node_remover.urdf.xacro')
     
     ubiquity_motor_pkg_share = get_package_share_directory('ubiquity_motor_ros2')
     robot_controllers = os.path.join(ubiquity_motor_pkg_share, "cfg", "conf.yaml")
@@ -42,7 +44,7 @@ def get_robot_spawner(*args):
                 'robot_description': magni_wb_xacro_path,
                 'use_sim_time': use_sim_time
             },
-            robot_controllers
+            robot_controllers,
         ],
         remappings=[
             ('/ubiquity_velocity_controller/cmd_vel', '/cmd_vel'),  # Remap the cmd_vel topic
@@ -90,6 +92,36 @@ def get_robot_spawner(*args):
         target_driver=magni_driver, nodes_to_start=robot_controller_spawner
     )
     
+    
+    # spawn supervisor logic copied from https://github.com/Ekumen-OS/andino_webots/blob/humble/andino_webots/launch/remove_nodes.launch.py
+    supervisor_robot_description = """
+        data: Robot { supervisor TRUE name "NodeRemover" controller "<extern>"}
+        """
+    
+    command = [
+        "ros2",
+        "service",
+        "call",
+        "/Ros2Supervisor/spawn_node_from_string",
+        "webots_ros2_msgs/srv/SpawnNodeFromString",
+        supervisor_robot_description,
+    ]
+    
+    spawn_supervisor = ExecuteProcess(
+        cmd=command,
+        output="log"
+    )
+    
+    
+    node_remover_controller = WebotsController(
+        robot_name="NodeRemover",
+        parameters=[
+            {
+                'robot_description': node_remover_xacro_path
+            },
+        ]
+    )
+    
     return [
         robot_spawner_node,
         launch.actions.RegisterEventHandler(
@@ -97,7 +129,9 @@ def get_robot_spawner(*args):
                 target_action=robot_spawner_node,
                 on_stdout=lambda event: get_webots_driver_node(
                     event, [
-                        magni_driver
+                        magni_driver,
+                        spawn_supervisor,
+                        node_remover_controller
                     ]
                 ),
             )
@@ -108,10 +142,24 @@ def get_robot_spawner(*args):
     ]    
 
 def generate_launch_description():
+    use_joy = LaunchConfiguration('use_joystick_teleop')
+    stamped = LaunchConfiguration('stamped')
+    
     use_sim_time_arg = DeclareLaunchArgument(
         "use_sim_time",
         default_value="true",
     )
+    
+    declare_use_joy = DeclareLaunchArgument(
+        'use_joystick_teleop', default_value='false',
+        description='If true start joystick teleop, otherwise keyboard teleop (default)'
+    )
+
+    declare_stamped = DeclareLaunchArgument(
+            'stamped', default_value='true',
+            description='Whether teleop should publish stamped Twist messages (true/false)'
+    )
+    
     # Package shares
     magni_webots_pkg_share = get_package_share_directory('magni_webots')
     
@@ -132,8 +180,20 @@ def generate_launch_description():
             on_exit=get_robot_spawner
         )
     )
+    
+    # Joystick teleop (started when use_joystick_teleop == true)
+    joy_node = Node(
+            package='teleop_twist_joy',
+            executable='teleop_node',
+            name='teleop_twist_joy',
+            output='screen',
+            parameters=[{'stamped': stamped}],
+            condition=IfCondition(use_joy),
+    )
 
     return LaunchDescription([
+        declare_stamped,
+        declare_use_joy,
         use_sim_time_arg,
         webots_launcher,
         webots_launcher._supervisor,
@@ -147,4 +207,6 @@ def generate_launch_description():
             )
         ),
         reset_handler,
-    ] + get_robot_spawner())
+    ] + get_robot_spawner() + [
+        joy_node,
+    ])
