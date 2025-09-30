@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="NodeRemover" xmlns:xacro="http://wiki.ros.org/xacro">
+    <webots>
+        <plugin type="magni_webots::NodeRemover" />
+    </webots>
+</robot>

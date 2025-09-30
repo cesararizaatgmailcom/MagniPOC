@@ -24,9 +24,7 @@ RUN wget -q https://cyberbotics.com/Cyberbotics.asc
 
 RUN echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" | sudo tee /etc/apt/sources.list.d/Cyberbotics.list
 
-RUN apt-get update
-
-RUN apt-get install -y python3-pip \
+RUN apt-get update && apt-get install -y python3-pip \
     python3-pillow \
     webots \
     ros-jazzy-webots-ros2 \
@@ -36,6 +34,7 @@ RUN apt-get install -y python3-pip \
     ros-jazzy-nav2-bringup \
     ros-jazzy-cartographer-ros \
     ros-jazzy-teleop-twist-keyboard \
+    ros-jazzy-teleop-twist-joy \
     ros-jazzy-image-transport-plugins
 
 WORKDIR /home/ws/
