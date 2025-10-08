@@ -8,7 +8,9 @@ fi
 docker stop magnipoc || true
 docker rm magnipoc || true
 docker run -d \
-    --device /dev/ttyAMA0 \
+    --device /dev/serial0:/dev/ttyAMA0 \
+    --device /dev/input/js0 \
+    --device /dev/i2c-1 \
     --cap-add=sys_nice \
     --ulimit rtprio=99 \
     --ulimit memlock=-1 \

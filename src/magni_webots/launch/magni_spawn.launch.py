@@ -142,22 +142,10 @@ def get_robot_spawner(*args):
     ]    
 
 def generate_launch_description():
-    use_joy = LaunchConfiguration('use_joystick_teleop')
-    stamped = LaunchConfiguration('stamped')
     
     use_sim_time_arg = DeclareLaunchArgument(
         "use_sim_time",
         default_value="true",
-    )
-    
-    declare_use_joy = DeclareLaunchArgument(
-        'use_joystick_teleop', default_value='false',
-        description='If true start joystick teleop, otherwise keyboard teleop (default)'
-    )
-
-    declare_stamped = DeclareLaunchArgument(
-            'stamped', default_value='true',
-            description='Whether teleop should publish stamped Twist messages (true/false)'
     )
     
     # Package shares
@@ -180,20 +168,23 @@ def generate_launch_description():
             on_exit=get_robot_spawner
         )
     )
-    
-    # Joystick teleop (started when use_joystick_teleop == true)
-    joy_node = Node(
-            package='teleop_twist_joy',
-            executable='teleop_node',
-            name='teleop_twist_joy',
-            output='screen',
-            parameters=[{'stamped': stamped}],
-            condition=IfCondition(use_joy),
-    )
 
+    teleop_twist_joy_pkg_share = get_package_share_directory('teleop_twist_joy')
+    teleop_twist_joy_launch = os.path.join(
+        teleop_twist_joy_pkg_share,
+        'launch',
+        'teleop-launch.py'
+    )
+    
+    teleop_twist_joy_include = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(teleop_twist_joy_launch),
+        launch_arguments={
+            'joy_config': 'ps3',
+            'publish_stamped_twist': 'True'
+        }.items()
+    )
+    
     return LaunchDescription([
-        declare_stamped,
-        declare_use_joy,
         use_sim_time_arg,
         webots_launcher,
         webots_launcher._supervisor,
@@ -207,6 +198,5 @@ def generate_launch_description():
             )
         ),
         reset_handler,
-    ] + get_robot_spawner() + [
-        joy_node,
-    ])
+        teleop_twist_joy_include,
+    ] + get_robot_spawner())
