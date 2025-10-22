@@ -28,7 +28,7 @@ RUN sed --in-place --expression \
 	'$isource "/home/ws/install/setup.bash"' \
 	/ros_entrypoint.sh
 
-RUN usermod -aG geoclue $USERNAME
+# RUN usermod -aG input magni
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["ros2", "launch", "magni_bringup", "magni_bringup.launch.py"]
