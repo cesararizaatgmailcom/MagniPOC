@@ -7,8 +7,7 @@ RUN apt-get install -y python3-pip \
     ros-jazzy-ros2-controllers \
     ros-jazzy-nav2-bringup \
     ros-jazzy-cartographer-ros \
-    ros-jazzy-teleop-twist-joy \
-    ros-jazzy-teleop-twist-keyboard
+    ros-jazzy-teleop-twist-joy
 
 RUN mkdir -p /home/ws/src
 WORKDIR /home/ws
@@ -22,11 +21,14 @@ RUN . /opt/ros/jazzy/setup.sh && \
     src/ubiquity_motor_ros2 \
     src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
     src/magni_description \
+    src/magni_bringup \
     --cmake-args --event-handlers console_direct+
 
 RUN sed --in-place --expression \
 	'$isource "/home/ws/install/setup.bash"' \
 	/ros_entrypoint.sh
 
+RUN usermod -aG geoclue $USERNAME
+
 ENTRYPOINT ["/ros_entrypoint.sh"]
-CMD ["ros2", "launch", "ubiquity_motor_ros2", "motors.launch.py"]
+CMD ["ros2", "launch", "magni_bringup", "magni_bringup.launch.py"]

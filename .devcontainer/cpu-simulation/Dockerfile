@@ -42,6 +42,8 @@ WORKDIR /home/ws/
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
 
+RUN usermod -aG geoclue $USERNAME
+
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
 CMD ["/bin/bash"]
