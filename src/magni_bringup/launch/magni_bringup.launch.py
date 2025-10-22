@@ -18,6 +18,13 @@ def generate_launch_description() -> LaunchDescription:
 				PythonLaunchDescriptionSource(motors_launch_path)
 		)
 
+		teleop_twist_joy_pkg_share = get_package_share_directory('teleop_twist_joy')
+		teleop_twist_joy_launch = os.path.join(
+			teleop_twist_joy_pkg_share,
+			'launch',
+			'teleop-launch.py'
+		)
+
 		teleop_twist_joy_include = IncludeLaunchDescription(
 			PythonLaunchDescriptionSource(teleop_twist_joy_launch),
 			launch_arguments={
