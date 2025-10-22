@@ -1,0 +1,96 @@
+---
+- name: Install sixad service from source
+  hosts: all
+  become: yes
+  vars:
+    sixad_repo: https://github.com/RetroPie/sixad.git
+    sixad_dest: /usr/src/sixad
+    build_deps:
+      - cmake
+      - libusb-dev
+      - libbluetooth-dev
+      - joystick
+      - checkinstall
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Ensure build dependencies are installed
+      apt:
+        name: "{{ build_deps }}"
+        state: present
+        install_recommends: no
+
+    - name: Ensure git is installed
+      apt:
+        name: git
+        state: present
+
+    - name: Create source directory
+      file:
+        path: "{{ sixad_dest }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Clone sixad repository
+      git:
+        repo: "{{ sixad_repo }}"
+        dest: "{{ sixad_dest }}"
+        update: yes
+        version: HEAD
+
+    - name: Create build directory
+      file:
+        path: "{{ sixad_dest }}/build"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Build sixad with make
+      command: make -j "{{ ansible_processor_vcpus | default(1) }}"
+      args:
+        chdir: "{{ sixad_dest }}"
+
+    - name: Install sixad using checkinstall
+      command: checkinstall -y --pkgname=sixad --pkgversion="1.0" --backup=no --deldoc=yes --fstrans=no --default
+      args:
+        chdir: "{{ sixad_dest }}"
+
+    - name: Ensure sixad service file exists
+      copy:
+        dest: /etc/systemd/system/sixad.service
+        content: |
+          [Unit]
+          Description=Sixad Bluetooth Daemon (xboxdrv controller daemon)
+          After=bluetooth.service
+
+          [Service]
+          Type=forking
+          ExecStart=/usr/sbin/sixad --daemon
+          ExecStop=/bin/kill -TERM $MAINPID
+          Restart=on-failure
+
+          [Install]
+          WantedBy=multi-user.target
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable and start sixad service
+      systemd:
+        name: sixad.service
+        enabled: yes
+        state: started
+
+    - name: Print completion message
+      debug:
+        msg: "sixad installation and service enablement completed."
