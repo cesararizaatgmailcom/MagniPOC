@@ -35,7 +35,6 @@ def generate_launch_description() -> LaunchDescription:
 
 		ld = LaunchDescription()
 		ld.add_action(include_motors)
-		ld.add_action(joy_node)
 		ld.add_action(teleop_twist_joy_include)
 		return ld
 

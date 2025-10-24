@@ -1,0 +1,10 @@
+---
+# Variables for deploy_magnipoc.yml
+magnipoc_image: ghcr.io/jandresbp/magnipoc:main
+
+# Joystick udev/symlink settings
+magnipoc_js_kernel: js0
+# basename used in SYMLINK (udev will create /dev/<basename>)
+magnipoc_js_symlink_basename: magnipoc_js0
+# full path to the symlink created by udev
+magnipoc_js_symlink: /dev/magnipoc_js0

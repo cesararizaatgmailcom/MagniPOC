@@ -1,0 +1,59 @@
+---
+# Playbook to deploy the Magnipoc docker container
+- name: Deploy Magnipoc container
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  collections:
+    - community.docker
+  tasks:
+    - name: Ensure docker python dependencies are available (Debian/Ubuntu)
+      apt:
+        name: python3-docker
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Pull Magnipoc image
+      community.docker.docker_image:
+        name: "{{ magnipoc_image }}"
+        source: pull
+
+    - name: Ensure old magnipoc container is absent
+      community.docker.docker_container:
+        name: magnipoc
+        state: absent
+        force_kill: yes
+
+    - name: Create udev rule for joystick and create stable symlink
+      copy:
+        dest: /etc/udev/rules.d/99-magnipoc-joystick.rules
+        content: 'KERNEL=="{{ magnipoc_js_kernel }}", SUBSYSTEM=="input", MODE="0660", SYMLINK+="{{ magnipoc_js_symlink_basename }}"'
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload udev rules
+      command: udevadm control --reload
+
+    - name: Trigger udev to apply rules for joystick
+      command: udevadm trigger --name-match={{ magnipoc_js_kernel }}
+      register: udev_trigger
+      changed_when: udev_trigger.rc == 0
+
+    - name: Run magnipoc container
+      community.docker.docker_container:
+        name: magnipoc
+        image: "{{ magnipoc_image }}"
+        state: started
+        restart_policy: unless-stopped
+        detach: true
+        devices:
+          - "/dev/serial0:/dev/ttyAMA0"
+          - "{{ magnipoc_js_symlink }}:/dev/input/js0"
+          - "/dev/i2c-1:/dev/i2c-1"
+        capabilities:
+          - SYS_NICE
+        ulimits:
+          - rtprio:99:99
+          - memlock:-1:-1
