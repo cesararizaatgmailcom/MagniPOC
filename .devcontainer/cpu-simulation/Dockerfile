@@ -43,6 +43,8 @@ WORKDIR /home/ws/
 # ********************************************************
 
 RUN usermod -aG geoclue $USERNAME
+RUN printf '%s\n' "alias sros='source /opt/ros/jazzy/setup.sh'" | sudo tee /etc/profile.d/ros_jazzy.sh > /dev/null \
+    && sudo chmod 0644 /etc/profile.d/ros_jazzy.sh
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
