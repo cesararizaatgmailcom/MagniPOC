@@ -7,7 +7,8 @@ RUN apt-get install -y python3-pip \
     ros-jazzy-ros2-controllers \
     ros-jazzy-nav2-bringup \
     ros-jazzy-cartographer-ros \
-    ros-jazzy-teleop-twist-joy
+    ros-jazzy-teleop-twist-joy \
+    ros-jazzy-joy-linux
 
 RUN mkdir -p /home/ws/src
 WORKDIR /home/ws
@@ -29,6 +30,9 @@ RUN sed --in-place --expression \
 	/ros_entrypoint.sh
 
 # RUN usermod -aG input magni
+
+RUN printf '%s\n' "alias sros='source /opt/ros/jazzy/setup.sh'" > /etc/profile.d/ros_jazzy.sh \
+    && chmod 0644 /etc/profile.d/ros_jazzy.sh
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["ros2", "launch", "magni_bringup", "magni_bringup.launch.py"]
