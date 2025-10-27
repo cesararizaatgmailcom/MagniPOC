@@ -37,7 +37,7 @@
       command: udevadm control --reload
 
     - name: Trigger udev to apply rules for joystick
-      command: udevadm trigger --name-match={{ magnipoc_js_kernel }}
+      command: udevadm trigger
       register: udev_trigger
       changed_when: udev_trigger.rc == 0
 
