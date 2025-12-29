@@ -27,9 +27,9 @@ namespace magni_webots
     robot_name_ = "magni";
     nodes_to_remove_ = {
         "left_caster_wheel_joint",
-        "left_caster_wheel_support_joint",
+        "left_caster_wheel_base_joint",
         "right_caster_wheel_joint",
-        "right_caster_wheel_support_joint"};
+        "right_caster_wheel_base_joint"};
   }
 
   void NodeRemover::step()

@@ -8,7 +8,7 @@
                 <imageSuffix>/image_raw</imageSuffix>
             </ros>
         </device>
-        <device reference="laser_sensor" type="Ray">
+        <device reference="laser" type="Ray">
             <ros>
                 <topicName>/scan</topicName>
                 <alwaysOn>true</alwaysOn>
