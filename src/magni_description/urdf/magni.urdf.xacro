@@ -27,8 +27,6 @@
   <xacro:include filename="$(find magni_description)/urdf/sensors/raspi_camera.xacro" />
   <xacro:include filename="$(find magni_description)/urdf/sensors/ur50_lidar.xacro" />
 
-
-
   <!-- Robot base_link -->
   <link name="base_link">
     <visual>
@@ -49,9 +47,6 @@
         <box size="0.375 0.268 0.034"/>
       </geometry>
     </collision>
-    <xacro:box_inertial_with_origin  x="0.398" y="0.221" z="0.150" mass="10.0">
-      <origin xyz="-0.15 0 0.03" rpy="0 0 0" />
-    </xacro:box_inertial_with_origin>
     
     <xacro:if value="${tower_installed}">
       <!-- Robot Tower -->
@@ -115,11 +110,15 @@
     </xacro:if>
   </link>
 
-  <!-- Fixed offset from the floor to the center of the wheels -->
-  <link name="base_footprint"/>
+<!-- Fixed offset from the floor to the center of the wheels -->
+  <link name="base_footprint">
+    <xacro:box_inertial_with_origin  x="0.398" y="0.221" z="0.150" mass="10.0">
+      <origin xyz="-0.15 0 0.03" rpy="0 0 0" />
+    </xacro:box_inertial_with_origin>
+  </link>
   <joint name="base_footprint_joint" type="fixed">
-    <parent link="base_link"/>
-    <child link="base_footprint"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
     <origin xyz="0 0 ${wheel_r}" rpy="0 0 0"/>
   </joint>
 
@@ -161,11 +160,11 @@
 
   <!-- Macro for defining caster wheels -->
   <xacro:macro name="caster_wheel" params="prefix reflect">
-    <link name="${prefix}_caster_wheel_support">
+    <link name="${prefix}_caster_wheel_base">
       <visual>
-        <origin xyz="0 0 0" rpy="0 0 ${pi}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://magni_description/meshes/caster_wheel.dae" />
+          <box size="0.03 0.03 0.003" />
         </geometry>
       </visual>
       <collision>
@@ -175,12 +174,35 @@
       </collision>
     </link>
     
-    <joint name="${prefix}_caster_wheel_support_joint" type="continuous">
+    <joint name="${prefix}_caster_wheel_base_joint" type="continuous">
       <origin xyz="${-wheel_xpos-0.169} ${reflect*0.169} ${-wheel_r+0.09}" rpy="0 0 0" />
       <axis xyz="0 0 1" rpy="0 0 0" /> 
       <parent link="base_link"/>
-      <child link="${prefix}_caster_wheel_support"/>
+      <child link="${prefix}_caster_wheel_base"/>
       <dynamics damping="0.0" friction="0.0"/> 
+    </joint>
+
+    <link name="${prefix}_caster_wheel_support">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 ${pi}" />
+        <geometry>
+          <mesh filename="package://magni_description/meshes/caster_wheel.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.03 0.003 0.03" />
+        </geometry>
+      </collision>
+      <xacro:box_inertial_with_origin  x="0.03" y="0.003" z="0.03" mass="0.1">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </xacro:box_inertial_with_origin>
+    </link>
+    
+    <joint name="${prefix}_caster_wheel_support_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${prefix}_caster_wheel_base"/>
+      <child link="${prefix}_caster_wheel_support"/>
     </joint>
 
     <link name="${prefix}_caster_wheel">

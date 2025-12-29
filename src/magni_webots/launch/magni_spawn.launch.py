@@ -34,7 +34,7 @@ def get_robot_spawner(*args):
         name='magni',
         robot_description=magni_description,
         relative_path_prefix=os.path.join(magni_description_pkg_share),
-        translation="0 0 0.1"
+        translation="0 0 0"
     )
     
     magni_driver = WebotsController(
