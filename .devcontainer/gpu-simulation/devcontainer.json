@@ -18,7 +18,15 @@
                 "twxs.cmake",
                 "donjayamanne.python-extension-pack",
                 "eamodio.gitlens"
-            ]
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            }
         }
     },
     "containerEnv": {
@@ -31,11 +39,13 @@
         "--pid=host",
         "--ipc=host",
         "-e", "DISPLAY=${env:DISPLAY}",
+        "-e", "__NV_PRIME_RENDER_OFFLOAD=1",
+        "-e", "__GLX_VENDOR_LIBRARY_NAME=nvidia",
         "--gpus", "all",
         "--device", "/dev/input/js0"
     ],
      "mounts": [
         "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
     ],
-    "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /home/ws/"
+    "postCreateCommand": "sudo chown -R $(whoami) /home/ws/"
 }
