@@ -35,7 +35,7 @@
 
 ## Launch & integration notes
 - Ensure `use_sim_time` is propagated to all nodes when running in Webots.
-- Mapping launch should allow starting with: `ros2 launch magni_bringup mapping.launch.py use_sim_time:=true` (or run `mapping.launch.py` from `magni_mapping`).
+- Mapping launch should allow starting with: `ros2 launch magni_bringup magni_bringup.launch.py enable_mapping:=true` (or run `ros2 launch magni_mapping mapping.launch.py`).
 - Provide remappings or parameter overrides for topic names if the Webots-URDF driver uses non-standard names.
 
 ## Smoke test (simulation) — acceptance criteria

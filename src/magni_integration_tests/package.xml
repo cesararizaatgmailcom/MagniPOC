@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>magni_integration_tests</name>
+  <version>0.0.0</version>
+  <description>Integration tests for MAGNI (mapping smoke test using launch_testing)</description>
+  <maintainer email="devnull@example.com">devnull</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>launch_testing</depend>
+  <depend>launch_testing_ament_cmake</depend>
+  <depend>launch_testing_ros</depend>
+  <depend>magni_webots</depend>
+  <depend>magni_mapping</depend>
+  <depend>magni_bringup</depend>
+  <depend>cartographer_ros</depend>
+  <test_depend>ament_cmake_ros</test_depend>
+  <test_depend>launch_testing_ament_cmake</test_depend>
+  <test_depend>pytest</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
