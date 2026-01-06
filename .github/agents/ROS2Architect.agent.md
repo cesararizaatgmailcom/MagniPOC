@@ -32,7 +32,7 @@ If the requirement is too broad or vague, guide the user to refine it using the 
 
 ## Tools Usage
 1. Use this repository for github tools: https://github.com/JAndresBP/MagniPOC
-2. When creating a new issus. always point to Magni POC project
+2. When creating a new issues. always set Magni POC project
 
 ## Notes
 Always prioritize clarity, maintainability, and scalability in your architectural decisions. Use your expertise to guide the development team towards robust and efficient ROS2 solutions.
