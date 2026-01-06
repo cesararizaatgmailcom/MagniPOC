@@ -1,0 +1,33 @@
+name: Mapping smoke test
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  mapping-smoke-test:
+    name: Mapping smoke test (self-hosted GPU)
+    runs-on: self-hosted
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build devcontainer image
+        run: |
+          docker build --file .devcontainer/gpu-simulation/Dockerfile -t magni-gpu-sim .
+
+      - name: Run mapping smoke test in container
+        # Mount workspace into /home/ws to preserve artifacts
+        run: |
+          docker run --rm --privileged --gpus all -v "${{ github.workspace }}:/home/ws" -w /home/ws magni-gpu-sim /bin/bash -lc "set -e; source /opt/ros/jazzy/setup.bash; colcon build --symlink-install || true; source install/setup.bash || true; ./scripts/run-mapping-smoke-test.sh 120"
+
+      - name: Upload map artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mapping-artifacts
+          path: |
+            map.pbstream
+            *.log
