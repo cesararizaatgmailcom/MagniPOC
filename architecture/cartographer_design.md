@@ -38,6 +38,37 @@
 - Mapping launch should allow starting with: `ros2 launch magni_bringup magni_bringup.launch.py enable_mapping:=true` (or run `ros2 launch magni_mapping mapping.launch.py`).
 - Provide remappings or parameter overrides for topic names if the Webots-URDF driver uses non-standard names.
 
+## Specialized Task Patterns — Cartographer Debugging & Integration
+This section collects practical patterns and checks extracted from common Cartographer integration tasks.
+
+### Launch configuration
+- Prefer passing `-configuration_directory <abs-path>` and `-configuration_basename <file>` via launch arguments (avoid ROS1 `$(find ...)` substitutions in YAML)
+- Validate the launch supplies the correct param file and `use_sim_time` consistently
+
+### Configuration validation
+- Verify top-level options in your Lua file: `map_frame`, `tracking_frame`, `published_frame`, `odom_frame`, `provide_odom_frame`, `use_odometry`, `use_nav_sat`, `use_landmarks`
+- Check trajectory builder params: `min_range`, `max_range`, `num_accumulated_range_data`, `use_imu_data`, `submaps.num_range_data`
+- Confirm `MAP_BUILDER.num_background_threads` is tuned for available CPU resources
+- Reference: https://google-cartographer-ros.readthedocs.io/en/latest/configuration.html
+
+### TF & frame troubleshooting
+- **Self-transform (`TF_SELF_TRANSFORM`)**: ensure `published_frame != odom_frame`. If `provide_odom_frame=true`, Cartographer publishes `odom_frame -> published_frame`.
+- **Frame unreachability**: verify the TF chain `sensor -> body_frame -> tracking_frame -> odom -> map` is complete
+- Use `ros2 run tf2_tools view_frames.py` to visualize the TF graph and `ros2 topic echo /scan` to confirm `frame_id`
+- Ensure `robot_state_publisher` (URDF static TFs) launches before odometry and Cartographer to avoid race conditions
+
+### Common patterns
+- Odometry-only (no IMU): `tracking_frame = "base_footprint"`, `use_imu_data = false`
+- External odometry: `use_odometry = true`, `provide_odom_frame = true`
+- If scan frame name is `laser` or `laser_link`, ensure URDF attaches that link to the body frame (fixed joint)
+
+### Quick checks
+- `ros2 param list /cartographer_node` and `ros2 param get /cartographer_node configuration_directory`
+- `ros2 topic echo /scan --once | grep frame_id`
+- `ros2 run tf2_tools view_frames.py` (open frames.pdf)
+
+(Adapted from the project agent guidance; keep this section in the architecture docs for reference and extension.)
+
 ## Smoke test (simulation) — acceptance criteria
 1. Start Webots simulation (`./scripts/launch-webots-simulation.sh`) with mapping launch added in a second terminal.
 2. Teleop robot for ~60–120s (use `./scripts/run-teleop-keyboard.sh`).
