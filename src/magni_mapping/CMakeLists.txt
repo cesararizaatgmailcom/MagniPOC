@@ -3,7 +3,7 @@ project(magni_mapping)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY config launch params
+install(DIRECTORY config launch
   DESTINATION share/${PROJECT_NAME}
 )
 

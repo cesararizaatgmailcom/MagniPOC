@@ -31,8 +31,8 @@ RUN sed --in-place --expression \
 
 # RUN usermod -aG input magni
 
-RUN printf '%s\n' "alias sros='source /opt/ros/jazzy/setup.sh'" > /etc/profile.d/ros_jazzy.sh \
-    && chmod 0644 /etc/profile.d/ros_jazzy.sh
+RUN echo "alias sros='source /opt/ros/jazzy/setup.sh'" >> ~/.bashrc
+RUN echo "alias sws='source /home/ws/install/setup.bash'" >> ~/.bashrc
 
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["ros2", "launch", "magni_bringup", "magni_bringup.launch.py"]

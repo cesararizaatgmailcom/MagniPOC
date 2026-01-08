@@ -1,13 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
 project(magni_integration_tests)
 
-find_package(ament_cmake REQUIRED)
-find_package(ament_cmake_ros REQUIRED)
-find_package(launch REQUIRED)
-find_package(launch_ros REQUIRED)
-find_package(launch_testing REQUIRED)
-find_package(launch_testing_ament_cmake REQUIRED)
-find_package(rclpy REQUIRED)
+########
+# test #
+########
 
 if(BUILD_TESTING)
   find_package(ament_cmake_ros REQUIRED)
@@ -19,7 +15,7 @@ if(BUILD_TESTING)
   endfunction()
 
   # Register integration tests
-  add_ros_isolated_launch_test(test/test_mapping_integration.py)
+  add_ros_isolated_launch_test(tests/test_mapping_launch.py)
 endif()
 
 ament_package()

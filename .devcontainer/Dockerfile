@@ -37,14 +37,18 @@ RUN apt-get update && apt-get install -y python3-pip \
     ros-jazzy-teleop-twist-joy \
     ros-jazzy-image-transport-plugins
 
+ENV SHELL=/bin/bash
+ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
+
 WORKDIR /home/ws/
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
 
 RUN usermod -aG geoclue $USERNAME
-RUN printf '%s\n' "alias sros='source /opt/ros/jazzy/setup.sh'" | sudo tee /etc/profile.d/ros_jazzy.sh > /dev/null \
-    && sudo chmod 0644 /etc/profile.d/ros_jazzy.sh
+RUN echo "alias sros='source /opt/ros/jazzy/setup.sh'" >> ~/.bashrc
+RUN echo "alias sws='source /home/ws/install/setup.bash'" >> ~/.bashrc
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME

@@ -53,7 +53,7 @@ def generate_test_description():
     return ld, {'bagfile': bagfile}
 
 
-class TestMappingIntegration(unittest.TestCase):
+class TestMapping(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rclpy.init()
@@ -63,7 +63,7 @@ class TestMappingIntegration(unittest.TestCase):
         rclpy.shutdown()
 
     def setUp(self):
-        self.node = rclpy.create_node('test_mapping_integration')
+        self.node = rclpy.create_node('test_mapping')
 
     def tearDown(self):
         self.node.destroy_node()
