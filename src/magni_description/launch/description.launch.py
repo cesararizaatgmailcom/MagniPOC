@@ -32,7 +32,8 @@ def generate_launch_description():
                             ' camera_extrinsics_file:=', LaunchConfiguration('camera_extrinsics_file')
                             ]),
                 value_type=str
-            )
+            ),
+            'use_sim_time': LaunchConfiguration('use_mock_hardware')
         }])
  
     ld = LaunchDescription(ARGUMENTS)

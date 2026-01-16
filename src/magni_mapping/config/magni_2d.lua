@@ -5,11 +5,11 @@ options = {
   map_builder = MAP_BUILDER,
   trajectory_builder = TRAJECTORY_BUILDER,
   map_frame = "map",
-  tracking_frame = "base_footprint",
-  published_frame = "base_footprint",  -- body frame, not odom (avoids odom->odom self-transform)
+  tracking_frame = "base_link",
+  published_frame = "odom",
   odom_frame = "odom",
-  provide_odom_frame = true,
-  publish_frame_projected_to_2d = true,
+  provide_odom_frame = false,
+  publish_frame_projected_to_2d = false,
   use_odometry = true,
   use_nav_sat = false,
   use_landmarks = false,
@@ -19,7 +19,7 @@ options = {
   num_point_clouds = 0,
   lookup_transform_timeout_sec = 0.2,
   submap_publish_period_sec = 0.3,
-  publish_tracked_pose = true,
+  -- publish_tracked_pose = true,
   pose_publish_period_sec = 0.05,
   trajectory_publish_period_sec = 0.01,
   rangefinder_sampling_ratio = 1.0,
@@ -33,13 +33,13 @@ MAP_BUILDER.use_trajectory_builder_2d = true
 
 -- Trajectory builder params (tune as needed)
 TRAJECTORY_BUILDER_2D.min_range = 0.1
-TRAJECTORY_BUILDER_2D.max_range = 30.0
+TRAJECTORY_BUILDER_2D.max_range = 3.0
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 5.0
 TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1
 
 -- Submaps
-MAP_BUILDER.num_background_threads = 4
-TRAJECTORY_BUILDER_2D.submaps.num_range_data = 90
+MAP_BUILDER.num_background_threads = 2
+-- TRAJECTORY_BUILDER_2D.submaps.num_range_data = 90
 
 -- Use odometry and disable IMU for now
 TRAJECTORY_BUILDER_2D.use_imu_data = false

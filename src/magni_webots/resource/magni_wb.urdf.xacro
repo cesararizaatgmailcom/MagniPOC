@@ -1,17 +1,20 @@
 <?xml version="1.0"?>
 <robot name="magni" xmlns:xacro="http://wiki.ros.org/xacro">
     <webots>
-        <device reference="camera1" type="Camera">
+        <device reference="raspicam" type="Camera">
             <ros>
                 <topicName>/rpicam</topicName>
                 <alwaysOn>true</alwaysOn>
                 <imageSuffix>/image_raw</imageSuffix>
             </ros>
         </device>
-        <device reference="laser" type="Ray">
+        <device reference="laser" type="Lidar">
             <ros>
+                <enabled>true</enabled>
+                <updateRate>10</updateRate>
                 <topicName>/scan</topicName>
                 <alwaysOn>true</alwaysOn>
+                <frameName>laser</frameName>
             </ros>
         </device>
         <plugin type="webots_ros2_control::Ros2Control" />
