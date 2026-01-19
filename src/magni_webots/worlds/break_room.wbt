@@ -32,6 +32,7 @@ WorldInfo {
     "This means that a robot could open a drawer, leave an object inside it, and close it."
   ]
   title "Break Room"
+  basicTimeStep 33
 }
 Viewpoint {
   orientation 0.35300149000136793 0.22405750567438093 -0.9083986912186679 2.4747580655075443

@@ -142,11 +142,8 @@ def get_robot_spawner(*args):
     ]    
 
 def generate_launch_description():
-    
-    use_sim_time_arg = DeclareLaunchArgument(
-        "use_sim_time",
-        default_value="true",
-    )
+    use_webots_gui_arg = DeclareLaunchArgument("use_webots_gui", default_value='false')
+    use_sim_time_arg = DeclareLaunchArgument("use_sim_time", default_value="true",)
     
     # Package shares
     magni_webots_pkg_share = get_package_share_directory('magni_webots')
@@ -156,6 +153,7 @@ def generate_launch_description():
 
     webots_launcher = WebotsLauncher(
         world=world_file,
+        gui=LaunchConfiguration("use_webots_gui"),
         # Set to false if Ros2Supervisor is started manually or if not needed immediately
         # However, for spawning URDFs, the supervisor is essential.
         # Ros2Supervisor is typically started by WebotsLauncher by default.
@@ -185,6 +183,7 @@ def generate_launch_description():
     )
     
     return LaunchDescription([
+        use_webots_gui_arg,
         use_sim_time_arg,
         webots_launcher,
         webots_launcher._supervisor,

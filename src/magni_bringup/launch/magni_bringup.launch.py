@@ -2,7 +2,6 @@ import os
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, TextSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -18,7 +17,10 @@ def generate_launch_description() -> LaunchDescription:
 			DeclareLaunchArgument('joy_vel', default_value='cmd_vel'),
 			DeclareLaunchArgument('joy_config', default_value='ps3'),
 			DeclareLaunchArgument('publish_stamped_twist', default_value='true'),
-			DeclareLaunchArgument('config_filepath', default_value=[TextSubstitution(text=os.path.join(get_package_share_directory('teleop_twist_joy'), 'config', '')),joy_config, TextSubstitution(text='.config.yaml')])
+			DeclareLaunchArgument('config_filepath', default_value=[TextSubstitution(text=os.path.join(get_package_share_directory('teleop_twist_joy'), 'config', '')),joy_config, TextSubstitution(text='.config.yaml')]),
+			DeclareLaunchArgument('enable_mapping', default_value='false'),
+			DeclareLaunchArgument('use_sim_time', default_value='false'),
+			DeclareLaunchArgument('map_output', default_value='map.pbstream'),
 		]
 
 		# Include the motors launch from ubiquity_motor_ros2
@@ -43,5 +45,6 @@ def generate_launch_description() -> LaunchDescription:
 		ld.add_action(include_motors)
 		ld.add_action(joy_linux_node)
 		ld.add_action(teleop_twist_joy_node)
+
 		return ld
 
