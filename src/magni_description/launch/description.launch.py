@@ -35,7 +35,7 @@ def generate_launch_description():
             ),
             'use_sim_time': LaunchConfiguration('use_mock_hardware')
         }])
- 
+    
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(robot_state_publisher)
     return ld

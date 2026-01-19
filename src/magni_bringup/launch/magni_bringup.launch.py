@@ -2,7 +2,6 @@ import os
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
-from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, TextSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -46,16 +45,6 @@ def generate_launch_description() -> LaunchDescription:
 		ld.add_action(include_motors)
 		ld.add_action(joy_linux_node)
 		ld.add_action(teleop_twist_joy_node)
-
-		# Optional mapping (for real robot): include magni_mapping's mapping.launch.py when enabled
-		map_pkg = get_package_share_directory('magni_mapping')
-		mapping_launch_path = os.path.join(map_pkg, 'launch', 'mapping.launch.py')
-		include_mapping = IncludeLaunchDescription(
-			PythonLaunchDescriptionSource(mapping_launch_path),
-			launch_arguments={'use_sim_time': LaunchConfiguration('use_sim_time'), 'map_output': LaunchConfiguration('map_output')}.items(),
-			condition=IfCondition(LaunchConfiguration('enable_mapping'))
-		)
-		ld.add_action(include_mapping)
 
 		return ld
 

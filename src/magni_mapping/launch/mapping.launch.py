@@ -17,9 +17,7 @@ def generate_launch_description():
         executable='cartographer_node',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
-        arguments=['-configuration_directory', config_dir,
-                   '-configuration_basename', 'magni_2d.lua'],
-        remappings=[('/scan', '/scan'), ('/odom', '/odom')]
+        arguments=['-configuration_directory', config_dir,'-configuration_basename', 'magni_2d.lua'],
     )
 
     occupancy_grid_node = Node(
