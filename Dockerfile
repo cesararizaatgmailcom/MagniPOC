@@ -19,7 +19,7 @@ COPY ./src/ubiquity_motor_ros2 /home/ws/src/ubiquity_motor_ros2
 COPY ./src/magni_description /home/ws/src/magni_description
 COPY ./src/magni_bringup /home/ws/src/magni_bringup
 
-WORKDIR /YDLidar-SDK
+WORKDIR /home/ws/src/YDLidar-SDK
 RUN mkdir -p build
 WORKDIR build
 RUN cmake ..
