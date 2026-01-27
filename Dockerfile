@@ -20,7 +20,11 @@ COPY ./src/magni_description /home/ws/src/magni_description
 COPY ./src/magni_bringup /home/ws/src/magni_bringup
 
 WORKDIR /YDLidar-SDK
-RUN mkdir build && cd build && cmake .. && make && make install
+RUN mkdir -p build
+WORKDIR build
+RUN cmake ..
+RUN make
+RUN make install
 
 WORKDIR /home/ws
 
