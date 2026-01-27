@@ -10,19 +10,19 @@ RUN apt-get install -y python3-pip \
     ros-jazzy-teleop-twist-joy \
     ros-jazzy-joy-linux
 
-RUN git clone git@github.com:JAndresBP/YDLidar-SDK.git
-WORKDIR /YDLidar-SDK
-RUN mkdir build && cd build && cmake .. && make && make install
-
 RUN mkdir -p /home/ws/src
 WORKDIR /home/ws
 
+COPY ./src/YDLidar-SDK /home/ws/src/YDLidar-SDK
+COPY ./src/ydlidar_ros2_driver /home/ws/src/ydlidar_ros2_driver
 COPY ./src/ubiquity_motor_ros2 /home/ws/src/ubiquity_motor_ros2
 COPY ./src/magni_description /home/ws/src/magni_description
 COPY ./src/magni_bringup /home/ws/src/magni_bringup
 
-RUN git clone -b humble git@github.com:JAndresBP ydlidar_ros2_driver.git /home/ws/src/ydlidar_ros2_driver
+WORKDIR /YDLidar-SDK
+RUN mkdir build && cd build && cmake .. && make && make install
 
+WORKDIR /home/ws
 
 RUN . /opt/ros/jazzy/setup.sh && \ 
     colcon build --base-paths \
