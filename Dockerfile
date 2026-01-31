@@ -30,7 +30,7 @@ RUN mkdir -p build && cd build && \
 
 # Build the ROS2 workspace
 WORKDIR /home/ws
-RUN . /opt/ros/jazzy/setup.sh && \
+RUN ./opt/ros/jazzy/setup.sh && \
     colcon build --base-paths \
     src/ubiquity_motor_ros2 \
     src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
