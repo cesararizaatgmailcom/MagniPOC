@@ -8,9 +8,9 @@ FROM arm64v8/ros:jazzy AS builder
 # Install build-time tooling and ROS packages required to build packages
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-      build-essential cmake python3-pip python3-colcon-common-extensions \
-      ros-jazzy-ros2-control \
-      ros-jazzy-ros2-controllers
+    build-essential cmake python3-pip python3-colcon-common-extensions \
+    ros-jazzy-ros2-control \
+    ros-jazzy-ros2-controllers
 
 # Workspace layout
 RUN mkdir -p /home/ws/src
@@ -32,11 +32,11 @@ RUN mkdir -p build && cd build && \
 WORKDIR /home/ws
 RUN . /opt/ros/jazzy/setup.sh && \
     colcon build --base-paths \
-      src/ubiquity_motor_ros2 \
-      src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
-      src/magni_description \
-      src/magni_bringup \
-      src/ydlidar_ros2_driver \
+    src/ubiquity_motor_ros2 \
+    src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
+    src/magni_description \
+    src/magni_bringup \
+    src/ydlidar_ros2_driver \
     --cmake-args --event-handlers console_direct+
 
 # ----------------------
@@ -47,9 +47,9 @@ FROM arm64v8/ros:jazzy-ros-core AS runtime
 # Install only runtime packages
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-      python3-pip \
-      ros-jazzy-ros2-control \
-      ros-jazzy-ros2-controllers
+    python3-pip \
+    ros-jazzy-ros2-control \
+    ros-jazzy-ros2-controllers
 
 # Create workspace layout and copy artifacts from the builder stage
 WORKDIR /home/ws
