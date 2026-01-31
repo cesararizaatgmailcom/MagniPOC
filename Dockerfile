@@ -6,11 +6,11 @@
 FROM arm64v8/ros:jazzy AS builder
 
 # Install build-time tooling and ROS packages required to build packages
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
-    build-essential cmake python3-pip python3-colcon-common-extensions \
+RUN apt-get update && apt-get upgrade -y
+
+RUN apt-get install -y python3-pip \
     ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers
+    ros-jazzy-ros2-controllers 
 
 # Workspace layout
 RUN mkdir -p /home/ws/src
@@ -30,7 +30,7 @@ RUN mkdir -p build && cd build && \
 
 # Build the ROS2 workspace
 WORKDIR /home/ws
-RUN ./opt/ros/jazzy/setup.sh && \
+RUN . /opt/ros/jazzy/setup.sh && \
     colcon build --base-paths \
     src/ubiquity_motor_ros2 \
     src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
