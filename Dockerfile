@@ -10,7 +10,11 @@ RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y python3-pip \
     ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers 
+    ros-jazzy-ros2-controllers \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-cartographer-ros \
+    ros-jazzy-teleop-twist-joy \
+    ros-jazzy-joy-linux
 
 # Workspace layout
 RUN mkdir -p /home/ws/src
