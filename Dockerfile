@@ -10,8 +10,7 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       build-essential cmake python3-pip python3-colcon-common-extensions \
       ros-jazzy-ros2-control \
-      ros-jazzy-ros2-controllers \
-    rm -rf /var/lib/apt/lists/*
+      ros-jazzy-ros2-controllers
 
 # Workspace layout
 RUN mkdir -p /home/ws/src
@@ -50,8 +49,7 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       python3-pip \
       ros-jazzy-ros2-control \
-      ros-jazzy-ros2-controllers \
-    rm -rf /var/lib/apt/lists/*
+      ros-jazzy-ros2-controllers
 
 # Create workspace layout and copy artifacts from the builder stage
 WORKDIR /home/ws
