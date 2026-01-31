@@ -35,12 +35,15 @@ RUN make install
 WORKDIR /home/ws
 RUN . /opt/ros/jazzy/setup.sh && \
     colcon build --base-paths \
-    src/magni_description \
     src/ubiquity_motor_ros2 \
     src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
-    src/ydlidar_ros2_driver \
-    src/magni_bringup \
     --cmake-args --event-handlers console_direct+
+
+RUN . /opt/ros/jazzy/setup.sh && \
+    colcon build --base-paths \
+    src/magni_description \
+    src/ydlidar_ros2_driver \
+    src/magni_bringup
 
 # ----------------------
 # Runtime stage: smaller image based on ros-core variant
