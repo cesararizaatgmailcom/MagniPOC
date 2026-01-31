@@ -17,6 +17,7 @@
   <depend>pluginlib</depend>
   <depend>webots_ros2_driver</depend>
   <depend>magni_description</depend>
+  <depend>magni_control_station</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

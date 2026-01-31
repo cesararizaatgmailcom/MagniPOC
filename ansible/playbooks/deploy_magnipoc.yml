@@ -25,14 +25,6 @@
         state: absent
         force_kill: yes
 
-    - name: Create udev rule for joystick and create stable symlink
-      copy:
-        dest: /etc/udev/rules.d/99-magnipoc-joystick.rules
-        content: 'KERNEL=="{{ magnipoc_js_kernel }}", SUBSYSTEM=="input", MODE="0660", SYMLINK+="{{ magnipoc_js_symlink_basename }}"'
-        owner: root
-        group: root
-        mode: '0644'
-
     - name: Reload udev rules
       command: udevadm control --reload
 
@@ -50,8 +42,8 @@
         detach: true
         devices:
           - "/dev/serial0:/dev/ttyAMA0"
-          - "{{ magnipoc_js_symlink }}:/dev/input/js0"
           - "/dev/i2c-1:/dev/i2c-1"
+          - "/dev/ttyUSB0:/dev/ttyUSB0"
         capabilities:
           - SYS_NICE
         ulimits:

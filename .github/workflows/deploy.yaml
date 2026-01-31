@@ -1,10 +1,17 @@
-name: Deploy docker image
+name: Deploy using Ansible
 
-on: [workflow_dispatch]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target: control_station, magni robots (magnipoc), or all"
+        required: true
+        default: all
+        type: choice
+        options:
+          - control_station
+          - magnipoc
+          - all
 
 jobs:
   deploy:
@@ -15,28 +22,31 @@ jobs:
       packages: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-            sparse-checkout: scripts
+          submodules: true
 
-      - name: Log in to the Container Registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.11'
 
-      - name: ensure image name is lowercase
-        id: tolowercase
-        env:
-          IMAGE_NAME_UC: ${{ env.IMAGE_NAME }}
+      - name: Install Ansible and collections
         run: |
-          echo "IMAGE_NAME_LC=${IMAGE_NAME_UC,,}" >>${GITHUB_ENV}
+          python -m pip install --upgrade pip
+          pip install 'ansible>=8.0.0'
+          ansible-galaxy collection install community.docker || true
 
-      - name: pull Docker image
-        run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LC }}:main
+      - name: Show chosen target
+        run: echo "Deploy target = '${{ github.event.inputs.target }}'"
 
-      - name: deploy Docker image
+      - name: Deploy Control Station
+        if: ${{ github.event.inputs.target == 'control_station' || github.event.inputs.target == 'all' }}
         run: |
-          ./scripts/run-container.sh ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LC }}:main
+          ansible-playbook ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini
+
+      - name: Deploy Magnipoc robots
+        if: ${{ github.event.inputs.target == 'magnipoc' || github.event.inputs.target == 'all' }}
+        run: |
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini
