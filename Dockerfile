@@ -25,18 +25,21 @@ COPY ./src/magni_bringup /home/ws/src/magni_bringup
 
 # Build YDLidar SDK
 WORKDIR /home/ws/src/YDLidar-SDK
-RUN mkdir -p build && cd build && \
-    cmake .. && make -j"$(nproc)" && make install
+RUN mkdir -p build
+WORKDIR build
+RUN cmake ..
+RUN make
+RUN make install
 
 # Build the ROS2 workspace
 WORKDIR /home/ws
 RUN . /opt/ros/jazzy/setup.sh && \
     colcon build --base-paths \
+    src/magni_description \
     src/ubiquity_motor_ros2 \
     src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
-    src/magni_description \
-    src/magni_bringup \
     src/ydlidar_ros2_driver \
+    src/magni_bringup \
     --cmake-args --event-handlers console_direct+
 
 # ----------------------
