@@ -4,14 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: "Deployment target: control_station, magni robots (magnipoc), or all"
+        description: "Deployment target: control_station, magni1, magni2, robots_only (group), or everything"
         required: true
-        default: all
+        default: everything
         type: choice
         options:
           - control_station
-          - magnipoc
-          - all
+          - magni1
+          - magni2
+          - robots_only
+          - everything
 
 jobs:
   deploy:
@@ -42,11 +44,21 @@ jobs:
         run: echo "Deploy target = '${{ github.event.inputs.target }}'"
 
       - name: Deploy Control Station
-        if: ${{ github.event.inputs.target == 'control_station' || github.event.inputs.target == 'all' }}
+        if: ${{ github.event.inputs.target == 'control_station' || github.event.inputs.target == 'everything' }}
         run: |
           ansible-playbook ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini
 
-      - name: Deploy Magnipoc robots
-        if: ${{ github.event.inputs.target == 'magnipoc' || github.event.inputs.target == 'all' }}
+      - name: Deploy Magnipoc - robots group
+        if: ${{ github.event.inputs.target == 'robots_only' || github.event.inputs.target == 'everything' }}
         run: |
-          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=robots"
+
+      - name: Deploy Magnipoc - magni1
+        if: ${{ github.event.inputs.target == 'magni1' }}
+        run: |
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni1"
+
+      - name: Deploy Magnipoc - magni2
+        if: ${{ github.event.inputs.target == 'magni2' }}
+        run: |
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni2"

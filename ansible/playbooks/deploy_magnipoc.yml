@@ -1,7 +1,8 @@
 ---
 # Playbook to deploy the Magnipoc docker container
 - name: Deploy Magnipoc container
-  hosts: all
+  # Accepts variable 'target' to specify host or group (e.g., 'robots', 'magni1', 'magni2')
+  hosts: "{{ target | default('robots') }}"
   become: yes
   vars_files:
     - vars.yml
