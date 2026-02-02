@@ -14,17 +14,6 @@
         state: present
       when: ansible_facts['os_family'] == 'Debian'
 
-    - name: Pull Control Station image
-      community.docker.docker_image:
-        name: "{{ control_station_image }}"
-        source: pull
-
-    - name: Ensure old control_station container is absent
-      community.docker.docker_container:
-        name: control_station
-        state: absent
-        force_kill: yes
-
     - name: Create udev rule for joystick and create stable symlink
       copy:
         dest: /etc/udev/rules.d/99-magnipoc-joystick.rules
@@ -45,6 +34,7 @@
       community.docker.docker_container:
         name: control_station
         image: "{{ control_station_image }}"
+        pull: true
         state: started
         restart_policy: unless-stopped
         detach: true
