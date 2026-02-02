@@ -41,24 +41,49 @@ jobs:
           ansible-galaxy collection install community.docker || true
 
       - name: Show chosen target
-        run: echo "Deploy target = '${{ github.event.inputs.target }}'"
+        run: |
+          echo "Deploy target = '${{ github.event.inputs.target }}'"
+          echo "Branch = '${{ github.ref_name }}'"
 
       - name: Deploy Control Station
         if: ${{ github.event.inputs.target == 'control_station' || github.event.inputs.target == 'everything' }}
         run: |
-          ansible-playbook ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          control_station_image="ghcr.io/jandresbp/magnipoc-control-station:${safe_branch}"
+          echo "Using image: ${control_station_image}"
+          ansible-playbook ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini --extra-vars "control_station_image=${control_station_image}"
+
 
       - name: Deploy Magnipoc - robots group
         if: ${{ github.event.inputs.target == 'robots_only' || github.event.inputs.target == 'everything' }}
         run: |
-          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=robots"
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          magnipoc_image="ghcr.io/jandresbp/magnipoc:${safe_branch}"
+          echo "Using image: ${magnipoc_image}"
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=robots magnipoc_image=${magnipoc_image}"
+
 
       - name: Deploy Magnipoc - magni1
         if: ${{ github.event.inputs.target == 'magni1' }}
         run: |
-          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni1"
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          magnipoc_image="ghcr.io/jandresbp/magnipoc:${safe_branch}"
+          echo "Using image: ${magnipoc_image}"
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni1 magnipoc_image=${magnipoc_image}"
+
 
       - name: Deploy Magnipoc - magni2
         if: ${{ github.event.inputs.target == 'magni2' }}
         run: |
-          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni2"
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          magnipoc_image="ghcr.io/jandresbp/magnipoc:${safe_branch}"
+          echo "Using image: ${magnipoc_image}"
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni2 magnipoc_image=${magnipoc_image}"
