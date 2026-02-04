@@ -9,9 +9,11 @@ FROM arm64v8/ros:jazzy AS builder
 RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y python3-pip \
+    ros-jazzy-robot-state-publisher \
+    ros-jazzy-joint-state-publisher \
+    ros-jazzy-xacro \
     ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers \
-    ros-jazzy-nav2-bringup
+    ros-jazzy-ros2-controllers 
 
 # Workspace layout
 RUN mkdir -p /home/ws/src
@@ -36,8 +38,8 @@ RUN make install
 WORKDIR /home/ws
 RUN . /opt/ros/jazzy/setup.sh && \
     colcon build --base-paths \
-    src/ubiquity_motor_ros2 \
     src/ubiquity_motor_ros2/ubiquity_motor_ros2_msgs \
+    src/ubiquity_motor_ros2 \
     --cmake-args --event-handlers console_direct+
 
 RUN . /opt/ros/jazzy/setup.sh && \
@@ -55,6 +57,8 @@ FROM arm64v8/ros:jazzy-ros-core AS runtime
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     python3-pip \
+    ros-jazzy-robot-state-publisher \
+    ros-jazzy-joint-state-publisher \
     ros-jazzy-xacro \
     ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers
@@ -64,8 +68,6 @@ WORKDIR /home/ws
 COPY --from=builder /home/ws/install /home/ws/install
 # Copy any system-installed files (e.g. YDLidar SDK installed into /usr/local)
 COPY --from=builder /usr/local /usr/local
-# Optionally copy source for debugging or future builds
-COPY ./src /home/ws/src
 
 # Ensure the container entrypoint sources the workspace install
 RUN sed --in-place --expression \
