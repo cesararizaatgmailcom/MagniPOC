@@ -9,12 +9,13 @@ FROM arm64v8/ros:jazzy AS builder
 RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y python3-pip \
-    ros-jazzy-std-msgs \
+    ros-jazzy-nav2-bringup \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-joint-state-publisher \
     ros-jazzy-xacro \
     ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers 
+    ros-jazzy-ros2-controllers \
+    ros-jazzy-teleop-twist-keyboard
 
 # Workspace layout
 RUN mkdir -p /home/ws/src
@@ -58,12 +59,14 @@ FROM arm64v8/ros:jazzy-ros-core AS runtime
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     python3-pip \
+    ros-jazzy-nav2-bringup \
     ros-jazzy-std-msgs \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-joint-state-publisher \
     ros-jazzy-xacro \
     ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers
+    ros-jazzy-ros2-controllers \
+    ros-jazzy-teleop-twist-keyboard
 
 # Create workspace layout and copy artifacts from the builder stage
 WORKDIR /home/ws
