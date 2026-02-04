@@ -9,6 +9,7 @@ FROM arm64v8/ros:jazzy AS builder
 RUN apt-get update && apt-get upgrade -y
 
 RUN apt-get install -y python3-pip \
+    ros-jazzy-std-msgs \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-joint-state-publisher \
     ros-jazzy-xacro \
@@ -57,6 +58,7 @@ FROM arm64v8/ros:jazzy-ros-core AS runtime
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     python3-pip \
+    ros-jazzy-std-msgs \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-joint-state-publisher \
     ros-jazzy-xacro \
