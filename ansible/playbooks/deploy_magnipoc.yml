@@ -23,6 +23,20 @@
       register: udev_trigger
       changed_when: udev_trigger.rc == 0
 
+    - name: Check if /dev/ttyUSB0 exists
+      stat:
+        path: /dev/ttyUSB0
+      register: tty_usb
+
+    - name: Set device mapping list for magnipoc container
+      set_fact:
+        magnipoc_devices: "{{ ['/dev/serial0:/dev/ttyAMA0', '/dev/i2c-1:/dev/i2c-1'] + (['/dev/ttyUSB0:/dev/ttyUSB0'] if tty_usb.stat.exists else []) }}"
+
+    - name: Warn when /dev/ttyUSB0 not present (skipping mapping)
+      debug:
+        msg: "/dev/ttyUSB0 not found, skipping device mapping"
+      when: not tty_usb.stat.exists
+
     - name: Run magnipoc container
       community.docker.docker_container:
         name: magnipoc
@@ -31,10 +45,7 @@
         state: started
         restart_policy: unless-stopped
         detach: true
-        devices:
-          - "/dev/serial0:/dev/ttyAMA0"
-          - "/dev/i2c-1:/dev/i2c-1"
-          - "/dev/ttyUSB0:/dev/ttyUSB0"
+        devices: "{{ magnipoc_devices }}"
         capabilities:
           - SYS_NICE
         ulimits:
