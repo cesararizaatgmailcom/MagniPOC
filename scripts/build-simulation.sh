@@ -11,4 +11,5 @@ colcon build --base-paths \
     src/magni_mapping \
     src/magni_webots \
     src/magni_integration_tests \
+    src/magni_control_station \
     --cmake-args --event-handlers console_direct+

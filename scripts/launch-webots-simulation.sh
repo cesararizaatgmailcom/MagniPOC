@@ -48,4 +48,4 @@ if [ "$MAPPING" = true ]; then
 fi
 
 # Launch the simulation (pass through chosen launch args)
-ros2 launch magni_bringup magni_sim_bringup.launch.py "${LAUNCH_ARGS[@]}"
+ros2 launch magni_webots magni_sim_bringup.launch.py "${LAUNCH_ARGS[@]}"

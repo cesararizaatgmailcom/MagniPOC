@@ -1,10 +1,19 @@
-name: Deploy docker image
+name: Deploy using Ansible
 
-on: [workflow_dispatch]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target: control_station, magni1, magni2, robots_only (group), or everything"
+        required: true
+        default: everything
+        type: choice
+        options:
+          - control_station
+          - magni1
+          - magni2
+          - robots_only
+          - everything
 
 jobs:
   deploy:
@@ -15,28 +24,66 @@ jobs:
       packages: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-            sparse-checkout: scripts
+          submodules: true
 
-      - name: Log in to the Container Registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.11'
 
-      - name: ensure image name is lowercase
-        id: tolowercase
-        env:
-          IMAGE_NAME_UC: ${{ env.IMAGE_NAME }}
+      - name: Install Ansible and collections
         run: |
-          echo "IMAGE_NAME_LC=${IMAGE_NAME_UC,,}" >>${GITHUB_ENV}
+          python -m pip install --upgrade pip
+          pip install 'ansible>=8.0.0'
+          ansible-galaxy collection install community.docker || true
 
-      - name: pull Docker image
+      - name: Show chosen target
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LC }}:main
+          echo "Deploy target = '${{ github.event.inputs.target }}'"
+          echo "Branch = '${{ github.ref_name }}'"
 
-      - name: deploy Docker image
+      - name: Deploy Control Station
+        if: ${{ github.event.inputs.target == 'control_station' || github.event.inputs.target == 'everything' }}
         run: |
-          ./scripts/run-container.sh ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LC }}:main
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          control_station_image="ghcr.io/jandresbp/magnipoc-control-station:${safe_branch}"
+          echo "Using image: ${control_station_image}"
+          ansible-playbook ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini --extra-vars "control_station_image=${control_station_image}"
+
+
+      - name: Deploy Magnipoc - robots group
+        if: ${{ github.event.inputs.target == 'robots_only' || github.event.inputs.target == 'everything' }}
+        run: |
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          magnipoc_image="ghcr.io/jandresbp/magnipoc:${safe_branch}"
+          echo "Using image: ${magnipoc_image}"
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=robots magnipoc_image=${magnipoc_image}"
+
+
+      - name: Deploy Magnipoc - magni1
+        if: ${{ github.event.inputs.target == 'magni1' }}
+        run: |
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          magnipoc_image="ghcr.io/jandresbp/magnipoc:${safe_branch}"
+          echo "Using image: ${magnipoc_image}"
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni1 magnipoc_image=${magnipoc_image}"
+
+
+      - name: Deploy Magnipoc - magni2
+        if: ${{ github.event.inputs.target == 'magni2' }}
+        run: |
+          branch="${{ github.ref_name }}"
+          branch=${branch:-main}
+          safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
+          magnipoc_image="ghcr.io/jandresbp/magnipoc:${safe_branch}"
+          echo "Using image: ${magnipoc_image}"
+          ansible-playbook ansible/playbooks/deploy_magnipoc.yml -i ansible/inventories/hosts.ini --extra-vars "target=magni2 magnipoc_image=${magnipoc_image}"

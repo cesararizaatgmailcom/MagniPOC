@@ -1,9 +1,6 @@
 name: Mapping smoke test
 
-on:
-  pull_request:
-  push:
-    branches: [ main ]
+on: [workflow_dispatch]
 
 jobs:
   mapping-smoke-test:

@@ -23,7 +23,7 @@ def generate_launch_description() -> LaunchDescription:
     )
     
     rviz_config = os.path.join(
-        get_package_share_directory('magni_bringup'),
+        get_package_share_directory('magni_control_station'),
         'config',
         'basicconf.rviz'
     )

@@ -2,7 +2,7 @@ import os
 from glob import glob
 from setuptools import find_packages, setup
 
-package_name = 'magni_bringup'
+package_name = 'magni_control_station'
 
 setup(
     name=package_name,
@@ -18,7 +18,7 @@ setup(
     zip_safe=True,
     maintainer='julio',
     maintainer_email='julioandres.bp@outlook.com',
-    description='TODO: Package description',
+    description='Control station that launches teleop, mapping and RViz',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={

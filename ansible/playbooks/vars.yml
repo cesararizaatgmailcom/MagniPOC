@@ -8,3 +8,8 @@ magnipoc_js_kernel: js0
 magnipoc_js_symlink_basename: magnipoc_js0
 # full path to the symlink created by udev
 magnipoc_js_symlink: /dev/magnipoc_js0
+
+# Control Station image (built by .github/workflows/build-control-station.yml)
+control_station_image: ghcr.io/jandresbp/magnipoc-control-station:main
+# Display for GUI in container (override if needed)
+control_station_display: ':0'

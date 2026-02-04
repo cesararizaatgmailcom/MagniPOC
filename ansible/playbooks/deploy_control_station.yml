@@ -1,0 +1,49 @@
+---
+# Playbook to deploy the control station docker container
+- name: Deploy Control Station container
+  hosts: control_station
+  become: yes
+  vars_files:
+    - vars.yml
+  collections:
+    - community.docker
+  tasks:
+    - name: Ensure docker python dependencies are available (Debian/Ubuntu)
+      apt:
+        name: python3-docker
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Create udev rule for joystick and create stable symlink
+      copy:
+        dest: /etc/udev/rules.d/99-magnipoc-joystick.rules
+        content: 'KERNEL=="{{ magnipoc_js_kernel }}", SUBSYSTEM=="input", MODE="0660", SYMLINK+="{{ magnipoc_js_symlink_basename }}"'
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload udev rules
+      command: udevadm control --reload
+
+    - name: Trigger udev to apply rules for joystick
+      command: udevadm trigger
+      register: udev_trigger
+      changed_when: udev_trigger.rc == 0
+
+    - name: Run control_station container
+      community.docker.docker_container:
+        name: control_station
+        image: "{{ control_station_image }}"
+        pull: true
+        state: started
+        restart_policy: unless-stopped
+        detach: true
+        network_mode: host
+        devices:
+          - "{{ magnipoc_js_symlink }}:/dev/input/js0"
+        volumes:
+          - "/tmp/.X11-unix:/tmp/.X11-unix"
+        env:
+          DISPLAY: "{{ control_station_display }}"
+        capabilities:
+          - SYS_NICE

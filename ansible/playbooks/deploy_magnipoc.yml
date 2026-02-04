@@ -1,7 +1,8 @@
 ---
 # Playbook to deploy the Magnipoc docker container
 - name: Deploy Magnipoc container
-  hosts: all
+  # Accepts variable 'target' to specify host or group (e.g., 'robots', 'magni1', 'magni2')
+  hosts: "{{ target | default('robots') }}"
   become: yes
   vars_files:
     - vars.yml
@@ -14,25 +15,6 @@
         state: present
       when: ansible_facts['os_family'] == 'Debian'
 
-    - name: Pull Magnipoc image
-      community.docker.docker_image:
-        name: "{{ magnipoc_image }}"
-        source: pull
-
-    - name: Ensure old magnipoc container is absent
-      community.docker.docker_container:
-        name: magnipoc
-        state: absent
-        force_kill: yes
-
-    - name: Create udev rule for joystick and create stable symlink
-      copy:
-        dest: /etc/udev/rules.d/99-magnipoc-joystick.rules
-        content: 'KERNEL=="{{ magnipoc_js_kernel }}", SUBSYSTEM=="input", MODE="0660", SYMLINK+="{{ magnipoc_js_symlink_basename }}"'
-        owner: root
-        group: root
-        mode: '0644'
-
     - name: Reload udev rules
       command: udevadm control --reload
 
@@ -41,17 +23,29 @@
       register: udev_trigger
       changed_when: udev_trigger.rc == 0
 
+    - name: Check if /dev/ttyUSB0 exists
+      stat:
+        path: /dev/ttyUSB0
+      register: tty_usb
+
+    - name: Set device mapping list for magnipoc container
+      set_fact:
+        magnipoc_devices: "{{ ['/dev/serial0:/dev/ttyAMA0', '/dev/i2c-1:/dev/i2c-1'] + (['/dev/ttyUSB0:/dev/ttyUSB0'] if tty_usb.stat.exists else []) }}"
+
+    - name: Warn when /dev/ttyUSB0 not present (skipping mapping)
+      debug:
+        msg: "/dev/ttyUSB0 not found, skipping device mapping"
+      when: not tty_usb.stat.exists
+
     - name: Run magnipoc container
       community.docker.docker_container:
         name: magnipoc
         image: "{{ magnipoc_image }}"
+        pull: true
         state: started
         restart_policy: unless-stopped
         detach: true
-        devices:
-          - "/dev/serial0:/dev/ttyAMA0"
-          - "{{ magnipoc_js_symlink }}:/dev/input/js0"
-          - "/dev/i2c-1:/dev/i2c-1"
+        devices: "{{ magnipoc_devices }}"
         capabilities:
           - SYS_NICE
         ulimits:

@@ -1,0 +1,35 @@
+FROM ros:jazzy
+
+RUN apt-get update && apt-get upgrade -y
+
+# Install runtime and teleop/rviz packages
+RUN apt-get install -y python3-pip \
+    ros-jazzy-teleop-twist-joy \
+    ros-jazzy-joy-linux \
+    ros-jazzy-rviz2 \
+    ros-jazzy-cartographer-ros || true
+
+# Workspace layout
+RUN mkdir -p /home/ws/src
+WORKDIR /home/ws
+
+# Copy all local source packages into the image
+COPY ./src /home/ws/src
+WORKDIR /home/ws
+
+# Build only the packages needed by the control station
+RUN . /opt/ros/jazzy/setup.sh && \
+    colcon build --base-paths \
+      src/magni_description \
+      src/magni_teleop \
+      src/magni_mapping \
+      src/magni_control_station \
+    --cmake-args --event-handlers console_direct+
+
+# Ensure container entrypoint sources the workspace install
+RUN sed --in-place --expression \
+    '$isource "/home/ws/install/setup.bash"' \
+    /ros_entrypoint.sh || true
+
+ENTRYPOINT ["/ros_entrypoint.sh"]
+CMD ["ros2", "launch", "magni_control_station", "control_station.launch.py"]
