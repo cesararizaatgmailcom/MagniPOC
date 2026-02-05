@@ -59,8 +59,6 @@ FROM arm64v8/ros:jazzy-ros-core AS runtime
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     python3-pip \
-    ros-jazzy-nav2-bringup \
-    ros-jazzy-std-msgs \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-joint-state-publisher \
     ros-jazzy-xacro \
