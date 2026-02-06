@@ -3,7 +3,8 @@ FROM ros:jazzy
 RUN apt-get update && apt-get upgrade -y
 
 # Install runtime and teleop/rviz packages
-RUN apt-get install -y python3-pip \
+RUN apt-get update && apt-get install -y python3-pip \
+    ros-jazzy-teleop-twist-keyboard \
     ros-jazzy-teleop-twist-joy \
     ros-jazzy-joy-linux \
     ros-jazzy-rviz2 \
@@ -25,6 +26,10 @@ RUN . /opt/ros/jazzy/setup.sh && \
       src/magni_mapping \
       src/magni_control_station \
     --cmake-args --event-handlers console_direct+
+
+ENV SHELL=/bin/bash
+ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-all}
 
 # Ensure container entrypoint sources the workspace install
 RUN sed --in-place --expression \
