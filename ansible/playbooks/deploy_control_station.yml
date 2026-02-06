@@ -56,7 +56,6 @@
         devices: "{{ control_station_devices }}"
         # Enable NVIDIA rendering support when available on host
         runtime: nvidia
-        gpus: all
         device_requests:
           - driver: nvidia
             count: -1
