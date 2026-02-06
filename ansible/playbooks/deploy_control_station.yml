@@ -53,5 +53,6 @@
           NVIDIA_VISIBLE_DEVICES: "{{ NVIDIA_VISIBLE_DEVICES | default('all') }}"
           NVIDIA_DRIVER_CAPABILITIES: "{{ NVIDIA_DRIVER_CAPABILITIES | default('all') }}"
           __GLX_VENDOR_LIBRARY_NAME: "{{ __GLX_VENDOR_LIBRARY_NAME | default('nvidia') }}"
+          XAUTHORITY: "{{ ansible_env.XAUTHORITY | default(ansible_env.HOME ~ '/.Xauthority') }}"
         capabilities:
           - SYS_NICE
