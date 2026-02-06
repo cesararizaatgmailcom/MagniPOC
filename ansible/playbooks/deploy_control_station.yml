@@ -37,7 +37,7 @@
 
     - name: Set device mapping list for control_station container
       set_fact:
-        control_station_devices: "{{ [ (magnipoc_js_symlink ~ ':/dev/input/js0') ] if js0.stat.exists else [] }}"
+        control_station_devices: "{{ (['{{ magnipoc_js_symlink }}:/dev/input/js0'] if js0.stat.exists else []) }}"
 
     - name: Warn when /dev/input/js0 not present (skipping mapping)
       debug:
