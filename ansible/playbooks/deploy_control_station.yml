@@ -30,20 +30,6 @@
       register: udev_trigger
       changed_when: udev_trigger.rc == 0
 
-    - name: Check if /dev/input/js0 exists
-      stat:
-        path: /dev/input/js0
-      register: js0
-
-    - name: Set device mapping list for control_station container
-      set_fact:
-        control_station_devices: "{{ (['{{ magnipoc_js_symlink }}:/dev/input/js0'] if js0.stat.exists else []) }}"
-
-    - name: Warn when /dev/input/js0 not present (skipping mapping)
-      debug:
-        msg: "/dev/input/js0 not found, skipping device mapping"
-      when: not js0.stat.exists
-
     - name: Run control_station container
       community.docker.docker_container:
         name: control_station
@@ -53,7 +39,6 @@
         restart_policy: unless-stopped
         detach: true
         network_mode: host
-        devices: "{{ control_station_devices }}"
         # Enable NVIDIA rendering support when available on host
         runtime: nvidia
         device_requests:
