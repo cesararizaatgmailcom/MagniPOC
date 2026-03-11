@@ -1,10 +1,10 @@
 [submodule "src/ubiquity_motor_ros2"]
 	path = src/ubiquity_motor_ros2
-	url = git@github.com:JAndresBP/ubiquity_motor_ros2.git
+	url = https://github.com/JAndresBP/ubiquity_motor_ros2.git
 [submodule "src/YDLidar-SDK"]
 	path = src/YDLidar-SDK
-	url = git@github.com:JAndresBP/YDLidar-SDK.git
+	url = https://github.com/JAndresBP/YDLidar-SDK.git
 [submodule "src/ydlidar_ros2_driver"]
 	path = src/ydlidar_ros2_driver
-	url = git@github.com:JAndresBP/ydlidar_ros2_driver.git
+	url = https://github.com/JAndresBP/ydlidar_ros2_driver.git
 	branch = humble
