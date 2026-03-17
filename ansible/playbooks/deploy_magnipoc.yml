@@ -45,6 +45,7 @@
         state: started
         restart_policy: unless-stopped
         detach: true
+        network_mode: host
         devices: "{{ magnipoc_devices }}"
         capabilities:
           - SYS_NICE
