@@ -39,11 +39,21 @@
         restart_policy: unless-stopped
         detach: true
         network_mode: host
-        devices:
-          - "{{ magnipoc_js_symlink }}:/dev/input/js0"
+        # Enable NVIDIA rendering support when available on host
+        runtime: nvidia
+        device_requests:
+          - driver: nvidia
+            count: -1
+            capabilities:
+              - gpu
         volumes:
           - "/tmp/.X11-unix:/tmp/.X11-unix"
+          - "{{ ansible_env.XAUTHORITY }}:{{ ansible_env.XAUTHORITY }}"
         env:
           DISPLAY: "{{ control_station_display }}"
+          NVIDIA_VISIBLE_DEVICES: "{{ NVIDIA_VISIBLE_DEVICES | default('all') }}"
+          NVIDIA_DRIVER_CAPABILITIES: "{{ NVIDIA_DRIVER_CAPABILITIES | default('all') }}"
+          __GLX_VENDOR_LIBRARY_NAME: "{{ __GLX_VENDOR_LIBRARY_NAME | default('nvidia') }}"
+          XAUTHORITY: "{{ ansible_env.XAUTHORITY }}"
         capabilities:
           - SYS_NICE

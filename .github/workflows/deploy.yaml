@@ -53,7 +53,7 @@ jobs:
           safe_branch=$(echo "$branch" | sed 's#/##g' | sed 's/[^a-zA-Z0-9_.-]/-/g')
           control_station_image="ghcr.io/jandresbp/magnipoc-control-station:${safe_branch}"
           echo "Using image: ${control_station_image}"
-          ansible-playbook ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini --extra-vars "control_station_image=${control_station_image}"
+          ansible-playbook -K ansible/playbooks/deploy_control_station.yml -i ansible/inventories/hosts.ini --extra-vars "control_station_image=${control_station_image}"
 
 
       - name: Deploy Magnipoc - robots group
