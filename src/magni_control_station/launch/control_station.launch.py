@@ -13,11 +13,13 @@ def generate_launch_description() -> LaunchDescription:
     teleop_arg = LaunchConfiguration('teleop')
     mapping_arg = LaunchConfiguration('mapping')
     rviz_arg = LaunchConfiguration('rviz')
+    navigation_arg = LaunchConfiguration('navigation')
 
     args = [
         DeclareLaunchArgument('teleop', default_value='false', description='Launch teleop'),
         DeclareLaunchArgument('mapping', default_value='true', description='Launch mapping'),
         DeclareLaunchArgument('rviz', default_value='true', description='Launch RViz'),
+        DeclareLaunchArgument('navigation', default_value='true', description='Launch navigation'),
     ]
 
     # Include teleop
@@ -43,10 +45,24 @@ def generate_launch_description() -> LaunchDescription:
         arguments=['--display-config=' + rviz_config],
         condition=IfCondition(rviz_arg)
     )
+    
+    magni_navigation_pkg_share = get_package_share_directory('magni_navigation')
+    magni_navigation_launch = os.path.join(
+        magni_navigation_pkg_share,
+        'launch',
+        'navigation.launch.py'
+    )
+    navigation_launcher = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            magni_navigation_launch
+        ),
+        condition=IfCondition(navigation_arg)
+    )
 
     ld = LaunchDescription(args)
     ld.add_action(include_teleop)
     ld.add_action(include_mapping)
+    ld.add_action(navigation_launcher)
     ld.add_action(rviz_node)
 
     return ld

@@ -27,6 +27,7 @@ RUN . /opt/ros/jazzy/setup.sh && \
       src/magni_teleop \
       src/magni_mapping \
       src/magni_control_station \
+      src/magni_navigation \
     --cmake-args --event-handlers console_direct+
 
 ENV SHELL=/bin/bash
